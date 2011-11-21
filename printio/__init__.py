@@ -17,4 +17,3 @@ __email__ = "mike@taylortree.com"
 __homepage__ = "http://github.com/taylortree/printio"
 __copyright__ = "Copyright 2011, Mike Taylor <mike@taylortree.com>"
 __license__ = "MIT"
-

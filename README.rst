@@ -2,7 +2,7 @@ printio
 =======
 *printio* is a MIT licensed pretty printing library implemented in Python.
 
-Format a value, list of lists, or list of dictionaries for printing or display using Python's built-in String Format library.  
+Format a value, list of lists, or list of dictionaries for printing or display using Python's built-in String Format library.
 
 Most of the string formatting options from the Format Specification Mini-Language are available.  See the formatting options here:
     http://docs.python.org/release/3.1.2/library/string.html#format-specification-mini-language
@@ -77,14 +77,14 @@ Now, let's get down to business...
     >>> pv.format(value)
     23.5
 
-2. Format a float into a percentage. ::
+3. Format a float into a percentage. ::
     
     >>> value = 0.025
     >>> pv = PrettyValue('.2%')
     >>> pv.format(value)
     2.50%
 
-2. Format a list of lists with default options. ::
+4. Format a list of lists with default options. ::
     
     >>> ps = PrettySeries()
     >>> for row in ps.format(lol): print row
@@ -93,7 +93,7 @@ Now, let's get down to business...
     ['1', 'goog', '200.4565']
     ['2', 't   ', '1.0     ']
 
-3. Same as above but this time in text. ::
+5. Same as above but this time in text. ::
     
     >>> results = ps.text(lol)
     >>> print results
@@ -105,7 +105,7 @@ Now, let's get down to business...
     | 2 | t    | 1.0      |
     +---+------+----------+    
 
-4. Want to add better column names? ::
+6. Want to add better column names? ::
     
     >>> ps.addcolumn(0, cname='Bar')
     >>> ps.addcolumn(1, cname='Symbol')
@@ -119,7 +119,7 @@ Now, let's get down to business...
     | 2   | t      | 1.0      |
     +-----+--------+----------+        
 
-5. Only print the Close column, always show sign, and format with decimal precision of 2? ::
+7. Only print the Close column, always show sign, and format with decimal precision of 2? ::
     
     >>> ps = PrettySeries()
     >>> ps.addcolumn(2, '+.2f', cname='Close')
@@ -132,7 +132,7 @@ Now, let's get down to business...
     | +  1.00 |
     +---------+    
 
-6. Print the list of dictionaries with the numerical settings for the bar & close. ::
+8. Print the list of dictionaries with the numerical settings for the bar & close. ::
     
     >>> ps = PrettySeries()
     >>> ps.addcolumn('bar', 'i')
