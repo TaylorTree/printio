@@ -1,0 +1,11 @@
+include AUTHORS
+include CHANGES
+include LICENSE
+include README.rst
+include MANIFEST.in
+recursive-include printio *.py
+recursive-include tests *.py
+prune tests/*.pyc
+prune tests/*.pyo
+prune printio/*.pyc
+prune printio/*.pyo
