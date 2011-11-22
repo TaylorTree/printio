@@ -377,16 +377,16 @@ class PrettyValue(object):
         return result
 
 
-class PrettySeries(object):
-    """Pretty-up a series of values based on various formatting
+class PrettyValues(object):
+    """Pretty format values based on various formatting
     options.
 
     Examples:
-    >>> series = [['yhoo', 23.4564], ['goog', 200]]
-    >>> ps = PrettySeries()
-    >>> ps.addcolumn(0, cname='Symbol')
-    >>> ps.addcolumn(1, '+.2f', cname='Closing Price')
-    >>> results = ps.format(series)
+    >>> values = [['yhoo', 23.4564], ['goog', 200]]
+    >>> pv = PrettyValues()
+    >>> pv.addcolumn(0, cname='Symbol')
+    >>> pv.addcolumn(1, '+.2f', cname='Closing Price')
+    >>> results = pv.format(values)
     >>> results[0]
     ['Symbol', 'Closing Price']
     >>> results[1]
@@ -406,7 +406,7 @@ class PrettySeries(object):
                   cname=None,
                   cformat=None,
                   cfill=None):
-        """Specify column attributes for prettying up your series.
+        """Specify column attributes for prettying up your values.
 
         :param key: index of the list or the key of the dict to format.
         :param vformat: (optional) format specifier of the values
@@ -426,7 +426,7 @@ class PrettySeries(object):
 
         self.columns.append([key, cname])
 
-    def text(self, series, useheader=True):
+    def text(self, values, useheader=True):
         """
         >>> lol = []
         >>> lol.append([0, 'yhoo', 23.45])
@@ -434,10 +434,14 @@ class PrettySeries(object):
         >>> lol.append([2, 't', 1.00])
         >>> keys = ['bar', 'symbol', 'close']
         >>> lod = [dict(zip(keys, x)) for x in lol]
-        >>> ps = PrettySeries()
-        >>> for row in ps.format(lol): print row
+        >>> pv = PrettyValues()
+        >>> for row in pv.format(lol): print row
+        ['0', '1   ', '2       ']
+        ['0', 'yhoo', '23.45   ']
+        ['1', 'goog', '200.4565']
+        ['2', 't   ', '1.0     ']
         """
-        records = self.format(series, useheader)
+        records = self.format(values, useheader)
 
         if not records:
             return ''
@@ -481,11 +485,11 @@ class PrettySeries(object):
 
         return lines
 
-    def format(self, series, useheader=True):
+    def format(self, values, useheader=True):
         """Return a pretty formatted list of lists based on the
         format specifiers of the columns.
 
-        :param series: list of lists or dicts to pretty format.
+        :param values: list of lists or dicts to pretty format.
         :useheader: (optional) whether to display the column header.
             * default is True
         """
@@ -500,14 +504,14 @@ class PrettySeries(object):
         #   * keys from a dictionary.
         #----------------------------------------------------------------------
         if not self.columns:
-            if not series:
+            if not values:
                 return results
 
             try:
-                keys = series[0].keys()
+                keys = values[0].keys()
 
             except AttributeError:
-                keys = range(len(series[0]))
+                keys = range(len(values[0]))
 
             for key in keys:
                 self.addcolumn(key)
@@ -516,7 +520,7 @@ class PrettySeries(object):
             sizes[key] = 0
 
         #This is the 1st pass to determine the maximum size of each column.
-        for row in series:
+        for row in values:
             for key, cname in self.columns:
                 pv = self.vformatters[key]
                 try:
@@ -552,7 +556,7 @@ class PrettySeries(object):
             results.append(headers)
 
         #Format based on the maximum size of the columns.
-        for row in series:
+        for row in values:
             record = []
             for key, cname in self.columns:
                 pv = self.vformatters[key]
@@ -570,7 +574,3 @@ def _testit(verbose=None):
 
 if __name__ == "__main__":
     _testit()
-    #print "** Need to create an autonum column for reporting **"
-    #print "** Need to add test cases for autonum **"
-    #print "** Need to add tb_html **"
-    #print "** Need to add pre_html **"

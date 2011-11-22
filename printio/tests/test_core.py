@@ -22,7 +22,7 @@ if not libpath in sys.path:
 del libpath
 
 from core import PrettyValue
-from core import PrettySeries
+from core import PrettyValues
 
 
 class PrettyValue_ParseTestCase(unittest.TestCase):
@@ -716,75 +716,75 @@ class PrettyValue_FormatTestCase(unittest.TestCase):
         self.assertEquals(pv.maxwidth, 6)
 
 
-class PrettySeries_TestCase(unittest.TestCase):
+class PrettyValues_TestCase(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_format_list(self):
-        ps = PrettySeries()
+    def test_format_lol(self):
+        pv = PrettyValues()
 
-        ps.addcolumn(0, 'i')
-        ps.addcolumn(1, cname='Column2')
-        ps.addcolumn(2, '+5.2f')
+        pv.addcolumn(0, 'i')
+        pv.addcolumn(1, cname='Column2')
+        pv.addcolumn(2, '+5.2f')
 
-        series = []
-        series.append([0, 'yhoo', 23.45])
-        series.append([1, 'goog', 200.4565])
-        series.append([2, 'newp', 1.00])
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
 
-        results = ps.format(series)
+        results = pv.format(values)
 
         self.assertEquals(results[0], ['0', 'Column2', '2      '])
         self.assertEquals(results[1], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[2], ['1', 'goog   ', '+200.46'])
         self.assertEquals(results[3], ['2', 'newp   ', '+  1.00'])
 
-    def test_format_list_noheader(self):
-        ps = PrettySeries()
+    def test_format_lol_noheader(self):
+        pv = PrettyValues()
 
-        ps.addcolumn(0, 'i')
-        ps.addcolumn(1, cname='Column2')
-        ps.addcolumn(2, '+5.2f')
+        pv.addcolumn(0, 'i')
+        pv.addcolumn(1, cname='Column2')
+        pv.addcolumn(2, '+5.2f')
 
-        series = []
-        series.append([0, 'yhoo', 23.45])
-        series.append([1, 'goog', 200.4565])
-        series.append([2, 'newp', 1.00])
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
 
-        results = ps.format(series, useheader=False)
+        results = pv.format(values, useheader=False)
 
         self.assertEquals(results[0], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[1], ['1', 'goog   ', '+200.46'])
         self.assertEquals(results[2], ['2', 'newp   ', '+  1.00'])
 
-    def test_format_list_nocolumns(self):
-        ps = PrettySeries()
+    def test_format_lol_nocolumns(self):
+        pv = PrettyValues()
 
-        series = []
-        series.append([0, 'yhoo', 23.45])
-        series.append([1, 'goog', 200.4565])
-        series.append([2, 'newp', 1.00])
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
 
-        results = ps.format(series)
+        results = pv.format(values)
 
         self.assertEquals(results[0], ['0', '1   ', '2       '])
         self.assertEquals(results[1], ['0', 'yhoo', '23.45   '])
         self.assertEquals(results[2], ['1', 'goog', '200.4565'])
         self.assertEquals(results[3], ['2', 'newp', '1.0     '])
 
-    def test_text_list(self):
-        ps = PrettySeries()
+    def test_text_lol(self):
+        pv = PrettyValues()
 
-        ps.addcolumn(0, 'i')
-        ps.addcolumn(1, cname='Column2')
-        ps.addcolumn(2, '+5.2f')
+        pv.addcolumn(0, 'i')
+        pv.addcolumn(1, cname='Column2')
+        pv.addcolumn(2, '+5.2f')
 
-        series = []
-        series.append([0, 'yhoo', 23.45])
-        series.append([1, 'goog', 200.4565])
-        series.append([2, 'newp', 1.00])
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
 
-        results = ps.text(series).split('\n')
+        results = pv.text(values).split('\n')
 
         self.assertEquals(results[0], '+---+---------+---------+')
         self.assertEquals(results[1], '| 0 | Column2 | 2       |')
@@ -794,53 +794,53 @@ class PrettySeries_TestCase(unittest.TestCase):
         self.assertEquals(results[5], '| 2 | newp    | +  1.00 |')
         self.assertEquals(results[6], '+---+---------+---------+')
 
-    def test_format_dict(self):
-        ps = PrettySeries()
+    def test_format_lod(self):
+        pv = PrettyValues()
 
-        ps.addcolumn('bar', 'i')
-        ps.addcolumn('sym', cname='Symbol')
-        ps.addcolumn('close', '+5.2f')
+        pv.addcolumn('bar', 'i')
+        pv.addcolumn('sym', cname='Symbol')
+        pv.addcolumn('close', '+5.2f')
 
-        series = []
-        series.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
-        series.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
-        series.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
+        values = []
+        values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
+        values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
+        values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
 
-        results = ps.format(series)
+        results = pv.format(values)
 
         self.assertEquals(results[0], ['bar', 'Symbol', 'close  '])
         self.assertEquals(results[1], ['  0', 'yhoo  ', '+ 23.45'])
         self.assertEquals(results[2], ['  1', 'goog  ', '+200.46'])
         self.assertEquals(results[3], ['  2', 'newp  ', '+  1.00'])
 
-    def test_format_dict_nocolumns(self):
-        ps = PrettySeries()
+    def test_format_lod_nocolumns(self):
+        pv = PrettyValues()
 
-        series = []
-        series.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
-        series.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
-        series.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
+        values = []
+        values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
+        values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
+        values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
 
-        results = ps.format(series)
+        results = pv.format(values)
 
         self.assertEquals(results[0], ['close   ', 'bar', 'sym '])
         self.assertEquals(results[1], ['23.45   ', '0  ', 'yhoo'])
         self.assertEquals(results[2], ['200.4565', '1  ', 'goog'])
         self.assertEquals(results[3], ['1.0     ', '2  ', 'newp'])
 
-    def test_text_dict(self):
-        ps = PrettySeries()
+    def test_text_lod(self):
+        pv = PrettyValues()
 
-        ps.addcolumn('bar', 'i')
-        ps.addcolumn('sym', cname='Symbol')
-        ps.addcolumn('close', '+5.2f')
+        pv.addcolumn('bar', 'i')
+        pv.addcolumn('sym', cname='Symbol')
+        pv.addcolumn('close', '+5.2f')
 
-        series = []
-        series.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
-        series.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
-        series.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
+        values = []
+        values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
+        values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
+        values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
 
-        results = ps.text(series).split('\n')
+        results = pv.text(values).split('\n')
 
         self.assertEquals(results[0], '+-----+--------+---------+')
         self.assertEquals(results[1], '| bar | Symbol | close   |')
@@ -851,18 +851,18 @@ class PrettySeries_TestCase(unittest.TestCase):
         self.assertEquals(results[6], '+-----+--------+---------+')
 
     def test_format_fill(self):
-        ps = PrettySeries()
+        pv = PrettyValues()
 
-        ps.addcolumn(0, 'i')
-        ps.addcolumn(1, vfill='.', cname='Column2')
-        ps.addcolumn(2, '+5.2f', cname='Close', cformat='^', cfill='_')
+        pv.addcolumn(0, 'i')
+        pv.addcolumn(1, vfill='.', cname='Column2')
+        pv.addcolumn(2, '+5.2f', cname='Close', cformat='^', cfill='_')
 
-        series = []
-        series.append([0, 'yhoo', 23.45])
-        series.append([1, 'goog', 200.4565])
-        series.append([2, 'newp', 1.00])
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
 
-        results = ps.format(series)
+        results = pv.format(values)
 
         self.assertEquals(results[0], ['0', 'Column2', '_Close_'])
         self.assertEquals(results[1], ['0', 'yhoo...', '+ 23.45'])
@@ -870,23 +870,23 @@ class PrettySeries_TestCase(unittest.TestCase):
         self.assertEquals(results[3], ['2', 'newp...', '+  1.00'])
 
     def test_format_invalids(self):
-        ps = PrettySeries()
+        pv = PrettyValues()
 
-        ps.addcolumn('open')
+        pv.addcolumn('open')
 
-        series = []
-        series.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
+        values = []
+        values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
 
-        self.assertRaises(KeyError, ps.format, series)
+        self.assertRaises(KeyError, pv.format, values)
 
-        ps = PrettySeries()
+        pv = PrettyValues()
 
-        ps.addcolumn(2)
+        pv.addcolumn(2)
 
-        series = []
-        series.append([0, 'yhoo'])
+        values = []
+        values.append([0, 'yhoo'])
 
-        self.assertRaises(IndexError, ps.format, series)
+        self.assertRaises(IndexError, pv.format, values)
 
 
 if __name__ == "__main__":
