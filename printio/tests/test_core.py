@@ -720,19 +720,47 @@ class PrettyValues_TestCase(unittest.TestCase):
     def setUp(self):
         pass
 
+    def test_format_list(self):
+        pv = PrettyValues()
+
+        pv.addcol(0, 'i')
+        pv.addcol(1, cname='Column2')
+        pv.addcol(2, '+5.2f')
+
+        values = [0, 'yhoo', 23.45]
+
+        results = pv.format(values)
+
+        self.assertEquals(results[0], ['0', 'Column2', '2     '])
+        self.assertEquals(results[1], ['0', 'yhoo   ', '+23.45'])
+
+    def test_format_dict(self):
+        pv = PrettyValues()
+
+        pv.addcol('bar', 'i')
+        pv.addcol('sym', cname='Column2')
+        pv.addcol('close', '+5.2f')
+
+        values = {'bar': 0, 'sym': 'yhoo', 'close': 23.45}
+
+        results = pv.format(values)
+
+        self.assertEquals(results[0], ['bar', 'Column2', 'close '])
+        self.assertEquals(results[1], ['  0', 'yhoo   ', '+23.45'])
+
     def test_format_lol(self):
         pv = PrettyValues()
 
-        pv.addcolumn(0, 'i')
-        pv.addcolumn(1, cname='Column2')
-        pv.addcolumn(2, '+5.2f')
+        pv.addcol(0, 'i')
+        pv.addcol(1, cname='Column2')
+        pv.addcol(2, '+5.2f')
 
         values = []
         values.append([0, 'yhoo', 23.45])
         values.append([1, 'goog', 200.4565])
         values.append([2, 'newp', 1.00])
 
-        results = pv.format(values)
+        results = pv.format(*values)
 
         self.assertEquals(results[0], ['0', 'Column2', '2      '])
         self.assertEquals(results[1], ['0', 'yhoo   ', '+ 23.45'])
@@ -742,16 +770,16 @@ class PrettyValues_TestCase(unittest.TestCase):
     def test_format_lol_noheader(self):
         pv = PrettyValues()
 
-        pv.addcolumn(0, 'i')
-        pv.addcolumn(1, cname='Column2')
-        pv.addcolumn(2, '+5.2f')
+        pv.addcol(0, 'i')
+        pv.addcol(1, cname='Column2')
+        pv.addcol(2, '+5.2f')
 
         values = []
         values.append([0, 'yhoo', 23.45])
         values.append([1, 'goog', 200.4565])
         values.append([2, 'newp', 1.00])
 
-        results = pv.format(values, useheader=False)
+        results = pv.format(*values, noheader=True)
 
         self.assertEquals(results[0], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[1], ['1', 'goog   ', '+200.46'])
@@ -765,7 +793,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         values.append([1, 'goog', 200.4565])
         values.append([2, 'newp', 1.00])
 
-        results = pv.format(values)
+        results = pv.format(*values)
 
         self.assertEquals(results[0], ['0', '1   ', '2       '])
         self.assertEquals(results[1], ['0', 'yhoo', '23.45   '])
@@ -775,16 +803,16 @@ class PrettyValues_TestCase(unittest.TestCase):
     def test_text_lol(self):
         pv = PrettyValues()
 
-        pv.addcolumn(0, 'i')
-        pv.addcolumn(1, cname='Column2')
-        pv.addcolumn(2, '+5.2f')
+        pv.addcol(0, 'i')
+        pv.addcol(1, cname='Column2')
+        pv.addcol(2, '+5.2f')
 
         values = []
         values.append([0, 'yhoo', 23.45])
         values.append([1, 'goog', 200.4565])
         values.append([2, 'newp', 1.00])
 
-        results = pv.text(values).split('\n')
+        results = pv.text(*values).split('\n')
 
         self.assertEquals(results[0], '+---+---------+---------+')
         self.assertEquals(results[1], '| 0 | Column2 | 2       |')
@@ -797,16 +825,16 @@ class PrettyValues_TestCase(unittest.TestCase):
     def test_format_lod(self):
         pv = PrettyValues()
 
-        pv.addcolumn('bar', 'i')
-        pv.addcolumn('sym', cname='Symbol')
-        pv.addcolumn('close', '+5.2f')
+        pv.addcol('bar', 'i')
+        pv.addcol('sym', cname='Symbol')
+        pv.addcol('close', '+5.2f')
 
         values = []
         values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
         values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
         values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
 
-        results = pv.format(values)
+        results = pv.format(*values)
 
         self.assertEquals(results[0], ['bar', 'Symbol', 'close  '])
         self.assertEquals(results[1], ['  0', 'yhoo  ', '+ 23.45'])
@@ -821,26 +849,60 @@ class PrettyValues_TestCase(unittest.TestCase):
         values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
         values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
 
-        results = pv.format(values)
+        results = pv.format(*values)
 
         self.assertEquals(results[0], ['close   ', 'bar', 'sym '])
         self.assertEquals(results[1], ['23.45   ', '0  ', 'yhoo'])
         self.assertEquals(results[2], ['200.4565', '1  ', 'goog'])
         self.assertEquals(results[3], ['1.0     ', '2  ', 'newp'])
 
+    def test_text_list(self):
+        pv = PrettyValues()
+
+        pv.addcol(0, 'i')
+        pv.addcol(1, cname='Column2')
+        pv.addcol(2, '+5.2f')
+
+        values = [0, 'yhoo', 23.45]
+
+        results = pv.text(values).split('\n')
+
+        self.assertEquals(results[0], '+---+---------+--------+')
+        self.assertEquals(results[1], '| 0 | Column2 | 2      |')
+        self.assertEquals(results[2], '+---+---------+--------+')
+        self.assertEquals(results[3], '| 0 | yhoo    | +23.45 |')
+        self.assertEquals(results[4], '+---+---------+--------+')
+
+    def test_text_dict(self):
+        pv = PrettyValues()
+
+        pv.addcol('bar', 'i')
+        pv.addcol('sym', cname='Column2')
+        pv.addcol('close', '+5.2f')
+
+        values = {'bar': 0, 'sym': 'yhoo', 'close': 23.45}
+
+        results = pv.text(values).split('\n')
+
+        self.assertEquals(results[0], '+-----+---------+--------+')
+        self.assertEquals(results[1], '| bar | Column2 | close  |')
+        self.assertEquals(results[2], '+-----+---------+--------+')
+        self.assertEquals(results[3], '|   0 | yhoo    | +23.45 |')
+        self.assertEquals(results[4], '+-----+---------+--------+')
+
     def test_text_lod(self):
         pv = PrettyValues()
 
-        pv.addcolumn('bar', 'i')
-        pv.addcolumn('sym', cname='Symbol')
-        pv.addcolumn('close', '+5.2f')
+        pv.addcol('bar', 'i')
+        pv.addcol('sym', cname='Symbol')
+        pv.addcol('close', '+5.2f')
 
         values = []
         values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
         values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
         values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
 
-        results = pv.text(values).split('\n')
+        results = pv.text(*values).split('\n')
 
         self.assertEquals(results[0], '+-----+--------+---------+')
         self.assertEquals(results[1], '| bar | Symbol | close   |')
@@ -853,16 +915,16 @@ class PrettyValues_TestCase(unittest.TestCase):
     def test_format_fill(self):
         pv = PrettyValues()
 
-        pv.addcolumn(0, 'i')
-        pv.addcolumn(1, vfill='.', cname='Column2')
-        pv.addcolumn(2, '+5.2f', cname='Close', cformat='^', cfill='_')
+        pv.addcol(0, 'i')
+        pv.addcol(1, vfill='.', cname='Column2')
+        pv.addcol(2, '+5.2f', cname='Close', cformat='^', cfill='_')
 
         values = []
         values.append([0, 'yhoo', 23.45])
         values.append([1, 'goog', 200.4565])
         values.append([2, 'newp', 1.00])
 
-        results = pv.format(values)
+        results = pv.format(*values)
 
         self.assertEquals(results[0], ['0', 'Column2', '_Close_'])
         self.assertEquals(results[1], ['0', 'yhoo...', '+ 23.45'])
@@ -872,21 +934,21 @@ class PrettyValues_TestCase(unittest.TestCase):
     def test_format_invalids(self):
         pv = PrettyValues()
 
-        pv.addcolumn('open')
+        pv.addcol('open')
 
         values = []
         values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
 
-        self.assertRaises(KeyError, pv.format, values)
+        self.assertRaises(KeyError, pv.format, *values)
 
         pv = PrettyValues()
 
-        pv.addcolumn(2)
+        pv.addcol(2)
 
         values = []
         values.append([0, 'yhoo'])
 
-        self.assertRaises(IndexError, pv.format, values)
+        self.assertRaises(IndexError, pv.format, *values)
 
 
 if __name__ == "__main__":

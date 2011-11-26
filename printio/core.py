@@ -384,9 +384,9 @@ class PrettyValues(object):
     Examples:
     >>> values = [['yhoo', 23.4564], ['goog', 200]]
     >>> pv = PrettyValues()
-    >>> pv.addcolumn(0, cname='Symbol')
-    >>> pv.addcolumn(1, '+.2f', cname='Closing Price')
-    >>> results = pv.format(values)
+    >>> pv.addcol(0, cname='Symbol')
+    >>> pv.addcol(1, '+.2f', cname='Closing Price')
+    >>> results = pv.format(*values)
     >>> results[0]
     ['Symbol', 'Closing Price']
     >>> results[1]
@@ -395,17 +395,17 @@ class PrettyValues(object):
     ['goog  ', '+      200.00']
     """
     def __init__(self):
-        self.columns = []
+        self.cols = []
         self.cformatters = {}
         self.vformatters = {}
 
-    def addcolumn(self,
-                  key,
-                  vformat=None,
-                  vfill=None,
-                  cname=None,
-                  cformat=None,
-                  cfill=None):
+    def addcol(self,
+               key,
+               vformat=None,
+               vfill=None,
+               cname=None,
+               cformat=None,
+               cfill=None):
         """Specify column attributes for prettying up your values.
 
         :param key: index of the list or the key of the dict to format.
@@ -424,24 +424,30 @@ class PrettyValues(object):
 
         self.cformatters[key] = PrettyValue(cformat, cfill)
 
-        self.columns.append([key, cname])
+        self.cols.append([key, cname])
 
-    def text(self, values, useheader=True):
+    def text(self, *values, **kwargs):
         """
+        :param args: list of values to pretty format to text.
+        ::param kwargs: following options are defined:
+            * noheader: if True headers will not be returned with results.
+
         >>> lol = []
         >>> lol.append([0, 'yhoo', 23.45])
         >>> lol.append([1, 'goog', 200.4565])
         >>> lol.append([2, 't', 1.00])
         >>> keys = ['bar', 'symbol', 'close']
-        >>> lod = [dict(zip(keys, x)) for x in lol]
         >>> pv = PrettyValues()
-        >>> for row in pv.format(lol): print row
-        ['0', '1   ', '2       ']
-        ['0', 'yhoo', '23.45   ']
-        ['1', 'goog', '200.4565']
-        ['2', 't   ', '1.0     ']
+        >>> print pv.text(*lol)
+        +---+------+----------+
+        | 0 | 1    | 2        |
+        +---+------+----------+
+        | 0 | yhoo | 23.45    |
+        | 1 | goog | 200.4565 |
+        | 2 | t    | 1.0      |
+        +---+------+----------+
         """
-        records = self.format(values, useheader)
+        records = self.format(*values, **kwargs)
 
         if not records:
             return ''
@@ -457,7 +463,11 @@ class PrettyValues(object):
             headers = ''.join((headers, ' ', value, ' |'))
             dashes = ''.join((dashes, '-' * (len(value) + 2), '+'))
 
-        if useheader:
+        noheader = False
+        if 'noheader' in kwargs and kwargs['noheader']:
+            noheader = True
+
+        if not noheader:
             line = ''.join((dashes, '\n'))
             output.write(line)
             line = ''.join((headers, '\n'))
@@ -485,17 +495,36 @@ class PrettyValues(object):
 
         return lines
 
-    def format(self, values, useheader=True):
-        """Return a pretty formatted list of lists based on the
+    def format(self, *values, **kwargs):
+        """Return a pretty formatted list of values based on the
         format specifiers of the columns.
 
-        :param values: list of lists or dicts to pretty format.
-        :useheader: (optional) whether to display the column header.
-            * default is True
+        :param args: list of values to pretty format.
+        ::param kwargs: following options are defined:
+            * noheader: if True headers will not be returned with results.
+        
+        >>> lol = []
+        >>> lol.append([0, 'yhoo', 23.45])
+        >>> lol.append([1, 'goog', 200.4565])
+        >>> lol.append([2, 't', 1.00])
+        >>> keys = ['bar', 'symbol', 'close']
+        >>> lod = [dict(zip(keys, x)) for x in lol]
+    
+        >>> pv = PrettyValues()
+        >>> pv.addcol('bar', 'i')
+        >>> pv.addcol('symbol')
+        >>> pv.addcol('close', '.2f')
+        >>> print pv.text(*lod)
+        
+    
         """
         results = []
 
         sizes = {}
+
+        noheader = False
+        if 'noheader' in kwargs and kwargs['noheader']:
+            noheader = True
 
         #----------------------------------------------------------------------
         #if user doesn't provide a set of columns then provide default
@@ -503,7 +532,7 @@ class PrettyValues(object):
         #   * indicies from a list or
         #   * keys from a dictionary.
         #----------------------------------------------------------------------
-        if not self.columns:
+        if not self.cols:
             if not values:
                 return results
 
@@ -514,14 +543,14 @@ class PrettyValues(object):
                 keys = range(len(values[0]))
 
             for key in keys:
-                self.addcolumn(key)
+                self.addcol(key)
 
-        for key, cname in self.columns:
+        for key, cname in self.cols:
             sizes[key] = 0
 
         #This is the 1st pass to determine the maximum size of each column.
         for row in values:
-            for key, cname in self.columns:
+            for key, cname in self.cols:
                 pv = self.vformatters[key]
                 try:
                     oldvalue = row[key]
@@ -536,29 +565,30 @@ class PrettyValues(object):
 
         #Build the column headings with the maximum size of the column.
         headers = []
-        for key, cname in self.columns:
+        for key, cname in self.cols:
             pc = self.cformatters[key]
-            newcolumn = pc.format(cname)
+            newcol = pc.format(cname)
 
             pv = self.vformatters[key]
             if pv.maxwidth > pc.maxwidth:
                 pc.set_width(pv.maxwidth)
                 pv.set_width(pv.maxwidth)
 
-                newcolumn = pc.format(cname)
+                newcol = pc.format(cname)
 
             else:
                 pv.set_width(pc.maxwidth)
 
-            headers.append(newcolumn)
+            headers.append(newcol)
 
-        if useheader:
+        if not noheader:
             results.append(headers)
 
+        
         #Format based on the maximum size of the columns.
         for row in values:
             record = []
-            for key, cname in self.columns:
+            for key, cname in self.cols:
                 pv = self.vformatters[key]
                 newvalue = pv.format(row[key])
                 record.append(newvalue)
