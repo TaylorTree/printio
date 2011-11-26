@@ -428,7 +428,7 @@ class PrettyValues(object):
 
     def text(self, *values, **kwargs):
         """
-        :param args: list of values to pretty format to text.
+        :param values: list of values to pretty format to text.
         ::param kwargs: following options are defined:
             * noheader: if True headers will not be returned with results.
 
@@ -499,24 +499,9 @@ class PrettyValues(object):
         """Return a pretty formatted list of values based on the
         format specifiers of the columns.
 
-        :param args: list of values to pretty format.
+        :param values: list of values to pretty format.
         ::param kwargs: following options are defined:
             * noheader: if True headers will not be returned with results.
-        
-        >>> lol = []
-        >>> lol.append([0, 'yhoo', 23.45])
-        >>> lol.append([1, 'goog', 200.4565])
-        >>> lol.append([2, 't', 1.00])
-        >>> keys = ['bar', 'symbol', 'close']
-        >>> lod = [dict(zip(keys, x)) for x in lol]
-    
-        >>> pv = PrettyValues()
-        >>> pv.addcol('bar', 'i')
-        >>> pv.addcol('symbol')
-        >>> pv.addcol('close', '.2f')
-        >>> print pv.text(*lod)
-        
-    
         """
         results = []
 
