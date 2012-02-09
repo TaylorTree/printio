@@ -30,7 +30,7 @@ The major functions of printio:
     Formats a single value to a string.
 
  - *PrettyValues():*
-    Formats a list or dict of values.
+    Formats a list of lists or dicts.
         - format: will return a list of strings including the header.
         - text: will return a string similar to MySQL's console display format.
 
@@ -87,24 +87,24 @@ Format a float into a percentage. ::
 Format a list. ::
     
     >>> pv = PrettyValues()
-    >>> for row in pv.format(lol[0]): print row
+    >>> for row in pv.format([lol[0]]): print row
     ['0', '1   ', '2    ']
     ['0', 'yhoo', '23.45']
     
 Format a dict. ::
     
     >>> pv = PrettyValues()
-    >>> pv.addcol('bar')
-    >>> pv.addcol('symbol')
-    >>> pv.addcol('close')
-    >>> for row in pv.format(lod[0]): print row
+    >>> pv.newcol('bar')
+    >>> pv.newcol('symbol')
+    >>> pv.newcol('close')
+    >>> for row in pv.format([lod[0]]): print row
     ['bar', 'symbol', 'close']
     ['0  ', 'yhoo  ', '23.45']
     
 Format a list of lists. ::
     
     >>> pv = PrettyValues()
-    >>> for row in pv.format(*lol): print row
+    >>> for row in pv.format(lol): print row
     ['0', '1   ', '2       ']
     ['0', 'yhoo', '23.45   ']
     ['1', 'goog', '200.4565']
@@ -113,7 +113,7 @@ Format a list of lists. ::
 Same as above but this time in text. ::
     
     >>> pv = PrettyValues()
-    >>> results = pv.text(*lol)
+    >>> results = pv.text(lol)
     >>> print results
     +---+------+----------+
     | 0 | 1    | 2        |
@@ -125,10 +125,10 @@ Same as above but this time in text. ::
 
 Want to add better column names? ::
     
-    >>> pv.addcol(0, cname='Bar')
-    >>> pv.addcol(1, cname='Symbol')
-    >>> pv.addcol(2, cname='Close')
-    >>> print pv.text(*lol)
+    >>> pv.newcol(0, cname='Bar')
+    >>> pv.newcol(1, cname='Symbol')
+    >>> pv.newcol(2, cname='Close')
+    >>> print pv.text(lol)
     +-----+--------+----------+
     | Bar | Symbol | Close    |
     +-----+--------+----------+
@@ -140,8 +140,8 @@ Want to add better column names? ::
 Print only the Close column, always show sign, and format with decimal precision of 2. ::
     
     >>> pv = PrettyValues()
-    >>> pv.addcol(2, '+.2f', cname='Close')
-    >>> print pv.text(*lol)
+    >>> pv.newcol(2, '+.2f', cname='Close')
+    >>> print pv.text(lol)
     +---------+
     | Close   |
     +---------+
@@ -153,10 +153,10 @@ Print only the Close column, always show sign, and format with decimal precision
 Print list of dictionaries with the numerical settings for the bar & close. ::
     
     >>> pv = PrettyValues()
-    >>> pv.addcol('bar', 'i')
-    >>> pv.addcol('symbol')
-    >>> pv.addcol('close', '.2f')
-    >>> print pv.text(*lod)
+    >>> pv.newcol('bar', 'i')
+    >>> pv.newcol('symbol')
+    >>> pv.newcol('close', '.2f')
+    >>> print pv.text(lod)
     +-----+--------+--------+
     | bar | symbol | close  |
     +-----+--------+--------+

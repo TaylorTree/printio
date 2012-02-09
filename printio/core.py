@@ -367,7 +367,6 @@ class PrettyValue(object):
                                              newprecision,
                                              newatype)
 
-        #print formatspecs
         result = formatspecs.format(newvalue)
 
         newwidth = len(result)
@@ -380,26 +379,31 @@ class PrettyValue(object):
 class PrettyValues(object):
     """Pretty format values based on various formatting
     options.
-
-    Examples:
-    >>> values = [['yhoo', 23.4564], ['goog', 200]]
+    
+    Usage:
+    >>> lol = []
+    >>> lol.append([0, 'yhoo', 23.45])
+    >>> lol.append([1, 'goog', 200.4565])
+    >>> lol.append([2, 't', 1.00])
     >>> pv = PrettyValues()
-    >>> pv.addcol(0, cname='Symbol')
-    >>> pv.addcol(1, '+.2f', cname='Closing Price')
-    >>> results = pv.format(*values)
-    >>> results[0]
-    ['Symbol', 'Closing Price']
-    >>> results[1]
-    ['yhoo  ', '+       23.46']
-    >>> results[2]
-    ['goog  ', '+      200.00']
+    >>> pv.newcol(0, 'i', cname='Bar')
+    >>> pv.newcol(1, cname='Symbol')
+    >>> pv.newcol(2, '+.2f', cname='Close')
+    >>> print pv.text(lol)
+    +-----+--------+---------+
+    | Bar | Symbol | Close   |
+    +-----+--------+---------+
+    |   0 | yhoo   | + 23.45 |
+    |   1 | goog   | +200.46 |
+    |   2 | t      | +  1.00 |
+    +-----+--------+---------+
     """
     def __init__(self):
         self.cols = []
         self.cformatters = {}
         self.vformatters = {}
 
-    def addcol(self,
+    def newcol(self,
                key,
                vformat=None,
                vfill=None,
@@ -426,28 +430,12 @@ class PrettyValues(object):
 
         self.cols.append([key, cname])
 
-    def text(self, *values, **kwargs):
+    def text(self, values, noheader=False):
         """
         :param values: list of values to pretty format to text.
-        ::param kwargs: following options are defined:
-            * noheader: if True headers will not be returned with results.
-
-        >>> lol = []
-        >>> lol.append([0, 'yhoo', 23.45])
-        >>> lol.append([1, 'goog', 200.4565])
-        >>> lol.append([2, 't', 1.00])
-        >>> keys = ['bar', 'symbol', 'close']
-        >>> pv = PrettyValues()
-        >>> print pv.text(*lol)
-        +---+------+----------+
-        | 0 | 1    | 2        |
-        +---+------+----------+
-        | 0 | yhoo | 23.45    |
-        | 1 | goog | 200.4565 |
-        | 2 | t    | 1.0      |
-        +---+------+----------+
+        :param noheader: if False (default) - headers returned with results.
         """
-        records = self.format(*values, **kwargs)
+        records = self.format(values, noheader=noheader)
 
         if not records:
             return ''
@@ -459,13 +447,9 @@ class PrettyValues(object):
         bar = 0
 
         headers = '|'
-        for value in records[0]:
-            headers = ''.join((headers, ' ', value, ' |'))
-            dashes = ''.join((dashes, '-' * (len(value) + 2), '+'))
-
-        noheader = False
-        if 'noheader' in kwargs and kwargs['noheader']:
-            noheader = True
+        for row in records[0]:
+            headers = ''.join((headers, ' ', row, ' |'))
+            dashes = ''.join((dashes, '-' * (len(row) + 2), '+'))
 
         if not noheader:
             line = ''.join((dashes, '\n'))
@@ -474,16 +458,17 @@ class PrettyValues(object):
             output.write(line)
             bar += 1
 
+        #build the detail records.
         details = records[bar:]
 
         if details:
             line = ''.join((dashes, '\n'))
             output.write(line)
 
-            for values in details:
+            for detail in details:
                 rows = '|'
-                for value in values:
-                    rows = ''.join((rows, ' ', value, ' |'))
+                for field in detail:
+                    rows = ''.join((rows, ' ', field, ' |'))
 
                 line = ''.join((rows, '\n'))
                 output.write(line)
@@ -495,21 +480,16 @@ class PrettyValues(object):
 
         return lines
 
-    def format(self, *values, **kwargs):
+    def format(self, values, noheader=False):
         """Return a pretty formatted list of values based on the
         format specifiers of the columns.
 
         :param values: list of values to pretty format.
-        ::param kwargs: following options are defined:
-            * noheader: if True headers will not be returned with results.
+        :param useheader: if False (default) - headers returned with results.
         """
         results = []
 
         sizes = {}
-
-        noheader = False
-        if 'noheader' in kwargs and kwargs['noheader']:
-            noheader = True
 
         #----------------------------------------------------------------------
         #if user doesn't provide a set of columns then provide default
@@ -528,7 +508,7 @@ class PrettyValues(object):
                 keys = range(len(values[0]))
 
             for key in keys:
-                self.addcol(key)
+                self.newcol(key)
 
         for key, cname in self.cols:
             sizes[key] = 0
@@ -589,3 +569,4 @@ def _testit(verbose=None):
 
 if __name__ == "__main__":
     _testit()
+    
