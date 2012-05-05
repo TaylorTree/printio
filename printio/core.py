@@ -379,7 +379,7 @@ class PrettyValue(object):
 class PrettyValues(object):
     """Pretty format values based on various formatting
     options.
-    
+
     Usage:
     >>> lol = []
     >>> lol.append([0, 'yhoo', 23.45])
@@ -404,7 +404,7 @@ class PrettyValues(object):
         self.vformatters = {}
 
     def newcol(self,
-               key,
+               key=None,
                vformat=None,
                vfill=None,
                cname=None,
@@ -412,7 +412,7 @@ class PrettyValues(object):
                cfill=None):
         """Specify column attributes for prettying up your values.
 
-        :param key: index of the list or the key of the dict to format.
+        :param key: (optional) index of list or key of the dict to format.
         :param vformat: (optional) format specifier of the values
             for the column.
         :param vfill: (optional) fill character for the values.
@@ -420,13 +420,19 @@ class PrettyValues(object):
         :param cformat: (optional) format specifier for the column name.
         :param cfill: (optional) fill character for the column name.
         """
+        if not key:
+            if self.cols:
+                key = len(self.cols)
+
+            else:
+                key = 0
 
         if not cname:
             cname = key
 
-        self.vformatters[key] = PrettyValue(vformat, vfill)
+        self.vformatters[key, cname] = PrettyValue(vformat, vfill)
 
-        self.cformatters[key] = PrettyValue(cformat, cfill)
+        self.cformatters[key, cname] = PrettyValue(cformat, cfill)
 
         self.cols.append([key, cname])
 
@@ -516,7 +522,7 @@ class PrettyValues(object):
         #This is the 1st pass to determine the maximum size of each column.
         for row in values:
             for key, cname in self.cols:
-                pv = self.vformatters[key]
+                pv = self.vformatters[key, cname]
                 try:
                     oldvalue = row[key]
 
@@ -531,10 +537,10 @@ class PrettyValues(object):
         #Build the column headings with the maximum size of the column.
         headers = []
         for key, cname in self.cols:
-            pc = self.cformatters[key]
+            pc = self.cformatters[key, cname]
             newcol = pc.format(cname)
 
-            pv = self.vformatters[key]
+            pv = self.vformatters[key, cname]
             if pv.maxwidth > pc.maxwidth:
                 pc.set_width(pv.maxwidth)
                 pv.set_width(pv.maxwidth)
@@ -549,12 +555,11 @@ class PrettyValues(object):
         if not noheader:
             results.append(headers)
 
-        
         #Format based on the maximum size of the columns.
         for row in values:
             record = []
             for key, cname in self.cols:
-                pv = self.vformatters[key]
+                pv = self.vformatters[key, cname]
                 newvalue = pv.format(row[key])
                 record.append(newvalue)
 
@@ -569,4 +574,3 @@ def _testit(verbose=None):
 
 if __name__ == "__main__":
     _testit()
-    

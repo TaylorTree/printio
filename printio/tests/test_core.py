@@ -748,6 +748,17 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[0], ['bar', 'Column2', 'close '])
         self.assertEquals(results[1], ['  0', 'yhoo   ', '+23.45'])
 
+    def test_nokey_dict(self):
+        pv = PrettyValues()
+
+        pv.newcol(vformat='i')
+        pv.newcol(cname='Column2')
+        pv.newcol(vformat='+5.2f')
+
+        values = {'bar': 0, 'sym': 'yhoo', 'close': 23.45}
+
+        self.assertRaises(KeyError, pv.format, [values])
+        
     def test_format_lol(self):
         pv = PrettyValues()
 
@@ -766,6 +777,44 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[2], ['1', 'goog   ', '+200.46'])
         self.assertEquals(results[3], ['2', 'newp   ', '+  1.00'])
+
+    def test_nokey_lol(self):
+        pv = PrettyValues()
+
+        pv.newcol(vformat='i')
+        pv.newcol(cname='Column2')
+        pv.newcol(vformat='+5.2f')
+
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
+
+        results = pv.format(values)
+
+        self.assertEquals(results[0], ['0', 'Column2', '2      '])
+        self.assertEquals(results[1], ['0', 'yhoo   ', '+ 23.45'])
+        self.assertEquals(results[2], ['1', 'goog   ', '+200.46'])
+        self.assertEquals(results[3], ['2', 'newp   ', '+  1.00'])
+
+    def test_dupcol_lol(self):
+        pv = PrettyValues()
+
+        pv.newcol(vformat='i')
+        pv.newcol(cname='Column2')
+        pv.newcol(1)
+
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
+
+        results = pv.format(values)
+
+        self.assertEquals(results[0], ['0', 'Column2', '1   '])
+        self.assertEquals(results[1], ['0', 'yhoo   ', 'yhoo'])
+        self.assertEquals(results[2], ['1', 'goog   ', 'goog'])
+        self.assertEquals(results[3], ['2', 'newp   ', 'newp'])
 
     def test_format_lol_noheader(self):
         pv = PrettyValues()
