@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2011, Mike Taylor
+# Copyright (c) 2012, Mike Taylor
 #
 # This file is part of printio released under MIT license.
 # See the LICENSE for more information.
@@ -13,7 +13,7 @@ Pretty-up your data for print or display.
 """
 
 import re
-import sys
+import math
 try:
     from cStringIO import StringIO
 
@@ -340,6 +340,9 @@ class PrettyValue(object):
         """
         newvalue = value
         newatype = self._atype
+        newprecision = ''
+        newsign = self.sign
+        newalign = self.align
 
         if self.typesummary == 'str':
             newvalue = str(value)
@@ -350,19 +353,57 @@ class PrettyValue(object):
         elif self.typesummary == 'float':
             newvalue = float(value)
 
+            if math.isnan(newvalue):
+                newvalue = "{0!r}".format(newvalue)
+                newatype = 's'
+                newsign = ''
+                if newalign == '=':
+                    newalign = '>'
+
+            elif math.isinf(newvalue):
+                newvalue = "{0!r}".format(newvalue)
+                newatype = 's'
+
+                asign = ''
+
+                beg_idx = 0
+                if newsign == '+':
+                    asign = '+'
+
+                newsign = ''
+
+                if newvalue[0] in ['+', '-']:
+                    asign = newvalue[0]
+                    beg_idx = 1
+
+                newvalue = newvalue[beg_idx:]
+
+                if newalign == '=':
+                    newalign = '>'
+
+                    if len(newvalue) < self.width:
+                        specs = '{0:>%s%s}' % (self.width - 1, newatype)
+
+                    else:
+                        specs = '{0:>%s%s}' % (self.width, newatype)
+
+                    newvalue = ''.join((asign, specs.format(newvalue)))
+
+                else:
+                    newvalue = ''.join((asign, newvalue))
+
+            elif self.precision:
+                newprecision = '.%s' % self.precision
+
         elif self.typesummary == 'unknown':
             formatspecs = '{0:%s}' % (newatype,)
             newvalue = formatspecs.format(newvalue)
             newatype = 's'
 
-        newprecision = ''
-        if self.precision:
-            newprecision = '.%s' % self.precision
-
         formatspecs = '{%s:%s%s%s%s%s%s}' % (0,
                                              self.fill,
-                                             self.align,
-                                             self.sign,
+                                             newalign,
+                                             newsign,
                                              self.width,
                                              newprecision,
                                              newatype)

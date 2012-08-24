@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2011, Mike Taylor
+# Copyright (c) 2012, Mike Taylor
 #
 # This file is part of printio released under MIT license.
 # See the LICENSE for more information.
@@ -733,6 +733,7 @@ class PrettyValues_TestCase(unittest.TestCase):
 
         self.assertEquals(results[0], ['0', 'Column2', '2     '])
         self.assertEquals(results[1], ['0', 'yhoo   ', '+23.45'])
+        self.assertEquals(len(results), 2)
 
     def test_format_dict(self):
         pv = PrettyValues()
@@ -747,6 +748,7 @@ class PrettyValues_TestCase(unittest.TestCase):
 
         self.assertEquals(results[0], ['bar', 'Column2', 'close '])
         self.assertEquals(results[1], ['  0', 'yhoo   ', '+23.45'])
+        self.assertEquals(len(results), 2)
 
     def test_nokey_dict(self):
         pv = PrettyValues()
@@ -758,7 +760,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         values = {'bar': 0, 'sym': 'yhoo', 'close': 23.45}
 
         self.assertRaises(KeyError, pv.format, [values])
-        
+
     def test_format_lol(self):
         pv = PrettyValues()
 
@@ -777,6 +779,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[2], ['1', 'goog   ', '+200.46'])
         self.assertEquals(results[3], ['2', 'newp   ', '+  1.00'])
+        self.assertEquals(len(results), 4)
 
     def test_nokey_lol(self):
         pv = PrettyValues()
@@ -796,6 +799,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[2], ['1', 'goog   ', '+200.46'])
         self.assertEquals(results[3], ['2', 'newp   ', '+  1.00'])
+        self.assertEquals(len(results), 4)
 
     def test_dupcol_lol(self):
         pv = PrettyValues()
@@ -815,6 +819,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['0', 'yhoo   ', 'yhoo'])
         self.assertEquals(results[2], ['1', 'goog   ', 'goog'])
         self.assertEquals(results[3], ['2', 'newp   ', 'newp'])
+        self.assertEquals(len(results), 4)
 
     def test_format_lol_noheader(self):
         pv = PrettyValues()
@@ -827,12 +832,123 @@ class PrettyValues_TestCase(unittest.TestCase):
         values.append([0, 'yhoo', 23.45])
         values.append([1, 'goog', 200.4565])
         values.append([2, 'newp', 1.00])
+        values.append([3, 'nan', 'nan'])
+        values.append([4, 'newp', 'inf'])
+        values.append([5, 'newp', '-inf'])
 
         results = pv.format(values, noheader=True)
 
         self.assertEquals(results[0], ['0', 'yhoo   ', '+ 23.45'])
         self.assertEquals(results[1], ['1', 'goog   ', '+200.46'])
         self.assertEquals(results[2], ['2', 'newp   ', '+  1.00'])
+        self.assertEquals(results[3], ['3', 'nan    ', '    nan'])
+        self.assertEquals(results[4], ['4', 'newp   ', '+   inf'])
+        self.assertEquals(results[5], ['5', 'newp   ', '-   inf'])
+        self.assertEquals(len(results), 6)
+
+    def test_format_lol_inf_1(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, cname='Column2')
+        pv.newcol(2, '+1.1f')
+
+        values = []
+        values.append([0, 'yhoo', 2])
+        values.append([1, 'goog', 5])
+        values.append([2, 'newp', 1])
+        values.append([3, 'nan', 'nan'])
+        values.append([4, 'newp', 'inf'])
+        values.append([5, 'newp', '-inf'])
+
+        results = pv.format(values, noheader=True)
+
+        self.assertEquals(results[0], ['0', 'yhoo   ', '+2.0'])
+        self.assertEquals(results[1], ['1', 'goog   ', '+5.0'])
+        self.assertEquals(results[2], ['2', 'newp   ', '+1.0'])
+        self.assertEquals(results[3], ['3', 'nan    ', ' nan'])
+        self.assertEquals(results[4], ['4', 'newp   ', '+inf'])
+        self.assertEquals(results[5], ['5', 'newp   ', '-inf'])
+        self.assertEquals(len(results), 6)
+
+    def test_format_lol_inf_2(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, cname='Column2')
+        pv.newcol(2, '=1.1f')
+
+        values = []
+        values.append([0, 'yhoo', 2])
+        values.append([1, 'goog', 5])
+        values.append([2, 'newp', 1])
+        values.append([3, 'nan', 'nan'])
+        values.append([4, 'newp', 'inf'])
+        values.append([5, 'newp', '-inf'])
+
+        results = pv.format(values, noheader=True)
+
+        self.assertEquals(results[0], ['0', 'yhoo   ', ' 2.0'])
+        self.assertEquals(results[1], ['1', 'goog   ', ' 5.0'])
+        self.assertEquals(results[2], ['2', 'newp   ', ' 1.0'])
+        self.assertEquals(results[3], ['3', 'nan    ', ' nan'])
+        self.assertEquals(results[4], ['4', 'newp   ', ' inf'])
+        self.assertEquals(results[5], ['5', 'newp   ', '-inf'])
+        self.assertEquals(len(results), 6)
+
+    def test_format_lol_inf_3(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, cname='Column2')
+        pv.newcol(2, '=5.1f')
+
+        values = []
+        values.append([0, 'yhoo', 2])
+        values.append([1, 'goog', 5])
+        values.append([2, 'newp', 1])
+        values.append([3, 'nan', 'nan'])
+        values.append([4, 'newp', 'inf'])
+        values.append([5, 'newp', '+inf'])
+        values.append([6, 'newp', '-inf'])
+
+        results = pv.format(values, noheader=True)
+
+        self.assertEquals(results[0], ['0', 'yhoo   ', '  2.0'])
+        self.assertEquals(results[1], ['1', 'goog   ', '  5.0'])
+        self.assertEquals(results[2], ['2', 'newp   ', '  1.0'])
+        self.assertEquals(results[3], ['3', 'nan    ', '  nan'])
+        self.assertEquals(results[4], ['4', 'newp   ', '  inf'])
+        self.assertEquals(results[5], ['5', 'newp   ', '  inf'])
+        self.assertEquals(results[6], ['6', 'newp   ', '- inf'])
+        self.assertEquals(len(results), 7)
+
+    def test_format_lol_inf_4(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, cname='Column2')
+        pv.newcol(2, '=+5.1f')
+
+        values = []
+        values.append([0, 'yhoo', 2])
+        values.append([1, 'goog', 5])
+        values.append([2, 'newp', 1])
+        values.append([3, 'nan', 'nan'])
+        values.append([4, 'newp', 'inf'])
+        values.append([5, 'newp', '+inf'])
+        values.append([6, 'newp', '-inf'])
+
+        results = pv.format(values, noheader=True)
+
+        self.assertEquals(results[0], ['0', 'yhoo   ', '+ 2.0'])
+        self.assertEquals(results[1], ['1', 'goog   ', '+ 5.0'])
+        self.assertEquals(results[2], ['2', 'newp   ', '+ 1.0'])
+        self.assertEquals(results[3], ['3', 'nan    ', '  nan'])
+        self.assertEquals(results[4], ['4', 'newp   ', '+ inf'])
+        self.assertEquals(results[5], ['5', 'newp   ', '+ inf'])
+        self.assertEquals(results[6], ['6', 'newp   ', '- inf'])
+        self.assertEquals(len(results), 7)
 
     def test_format_lol_nocolumns(self):
         pv = PrettyValues()
@@ -848,6 +964,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['0', 'yhoo', '23.45   '])
         self.assertEquals(results[2], ['1', 'goog', '200.4565'])
         self.assertEquals(results[3], ['2', 'newp', '1.0     '])
+        self.assertEquals(len(results), 4)
 
     def test_text_lol(self):
         pv = PrettyValues()
@@ -870,6 +987,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[4], '| 1 | goog    | +200.46 |')
         self.assertEquals(results[5], '| 2 | newp    | +  1.00 |')
         self.assertEquals(results[6], '+---+---------+---------+')
+        self.assertEquals(len(results), 7)
 
     def test_format_lod(self):
         pv = PrettyValues()
@@ -889,6 +1007,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['  0', 'yhoo  ', '+ 23.45'])
         self.assertEquals(results[2], ['  1', 'goog  ', '+200.46'])
         self.assertEquals(results[3], ['  2', 'newp  ', '+  1.00'])
+        self.assertEquals(len(results), 4)
 
     def test_format_lod_nocolumns(self):
         pv = PrettyValues()
@@ -904,6 +1023,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['23.45   ', '0  ', 'yhoo'])
         self.assertEquals(results[2], ['200.4565', '1  ', 'goog'])
         self.assertEquals(results[3], ['1.0     ', '2  ', 'newp'])
+        self.assertEquals(len(results), 4)
 
     def test_text_list(self):
         pv = PrettyValues()
@@ -921,6 +1041,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[2], '+---+---------+--------+')
         self.assertEquals(results[3], '| 0 | yhoo    | +23.45 |')
         self.assertEquals(results[4], '+---+---------+--------+')
+        self.assertEquals(len(results), 5)
 
     def test_text_dict(self):
         pv = PrettyValues()
@@ -938,6 +1059,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[2], '+-----+---------+--------+')
         self.assertEquals(results[3], '|   0 | yhoo    | +23.45 |')
         self.assertEquals(results[4], '+-----+---------+--------+')
+        self.assertEquals(len(results), 5)
 
     def test_text_lod(self):
         pv = PrettyValues()
@@ -950,6 +1072,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         values.append({'bar': 0, 'sym': 'yhoo', 'close': 23.45})
         values.append({'bar': 1, 'sym': 'goog', 'close': 200.4565})
         values.append({'bar': 2, 'sym': 'newp', 'close': 1.00})
+        values.append({'bar': 3, 'sym': 'nan', 'close': 'nan'})
 
         results = pv.text(values).split('\n')
 
@@ -959,7 +1082,9 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[3], '|   0 | yhoo   | + 23.45 |')
         self.assertEquals(results[4], '|   1 | goog   | +200.46 |')
         self.assertEquals(results[5], '|   2 | newp   | +  1.00 |')
-        self.assertEquals(results[6], '+-----+--------+---------+')
+        self.assertEquals(results[6], '|   3 | nan    |     nan |')
+        self.assertEquals(results[7], '+-----+--------+---------+')
+        self.assertEquals(len(results), 8)
 
     def test_format_fill(self):
         pv = PrettyValues()
@@ -979,6 +1104,7 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[1], ['0', 'yhoo...', '+ 23.45'])
         self.assertEquals(results[2], ['1', 'goog...', '+200.46'])
         self.assertEquals(results[3], ['2', 'newp...', '+  1.00'])
+        self.assertEquals(len(results), 4)
 
     def test_format_invalids(self):
         pv = PrettyValues()
