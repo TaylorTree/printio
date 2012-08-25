@@ -477,30 +477,78 @@ class PrettyValues(object):
 
         self.cols.append([key, cname])
 
-    def text(self, values, noheader=False):
+    def get_text_title(self, title, rowlength):
+        """
+        Currently truncates the title to the length of the
+            maximum row size - 2.  Plans for the future
+            are to break a title into multiple lines if cannot
+            fit on one line.
+        :param title: the overall title for the text table.
+        :param rowlength: the length of the text table row.
+        """
+        colcnt = len(self.cols)
+        rowarea = (colcnt * 2) + rowlength
+
+        _title = title.strip()[:rowarea]
+
+        padding = '-' * (rowarea + 2)
+        results = ''.join(('+', padding, '+', '\n'))
+
+        title_length = len(_title)
+        title_half = title_length / 2
+
+        lt_size = (rowarea / 2) - title_half
+        lt_padding = ' ' * lt_size
+
+        rt_size = rowarea - (lt_size + title_length)
+        rt_padding = ' ' * rt_size
+
+        lt_line = ''.join(('| ', lt_padding))
+        rt_line = ''.join((rt_padding, ' |', '\n'))
+
+        line = ''.join((lt_line, _title, rt_line))
+
+        results = ''.join((results, line))
+
+        return results
+
+    def text(self, values, title=None, useheader=True):
         """
         :param values: list of values to pretty format to text.
-        :param noheader: if False (default) - headers returned with results.
+        :param title: give the text table a title.
+        :param header: if True (default) - headers returned with results.
         """
-        records = self.format(values, noheader=noheader)
+        records = self.format(values, useheader=useheader)
 
         if not records:
             return ''
 
         output = StringIO()
 
+        rowlength = len(''.join(records[0]))
+
+        #build the columnar dash line
+        dash_line = '+'
+        for row in records[0]:
+            dash_line = ''.join((dash_line, '-' * (len(row) + 2), '+'))
+
+        #dash_line = ''.join((dash_line, '\n'))
+
         #build the header record.
-        dashes = '+'
         bar = 0
 
-        headers = '|'
-        for row in records[0]:
-            headers = ''.join((headers, ' ', row, ' |'))
-            dashes = ''.join((dashes, '-' * (len(row) + 2), '+'))
+        if title:
+            lines = self.get_text_title(title, rowlength)
+            output.write(lines)
 
-        if not noheader:
-            line = ''.join((dashes, '\n'))
+        if useheader:
+            headers = '|'
+            for row in records[0]:
+                headers = ''.join((headers, ' ', row, ' |'))
+
+            line = ''.join((dash_line, '\n'))
             output.write(line)
+
             line = ''.join((headers, '\n'))
             output.write(line)
             bar += 1
@@ -509,7 +557,7 @@ class PrettyValues(object):
         details = records[bar:]
 
         if details:
-            line = ''.join((dashes, '\n'))
+            line = ''.join((dash_line, '\n'))
             output.write(line)
 
             for detail in details:
@@ -523,16 +571,16 @@ class PrettyValues(object):
         lines = output.getvalue()
 
         if lines:
-            lines = ''.join((lines, dashes))
+            lines = ''.join((lines, dash_line))
 
         return lines
 
-    def format(self, values, noheader=False):
+    def format(self, values, useheader=True):
         """Return a pretty formatted list of values based on the
         format specifiers of the columns.
 
         :param values: list of values to pretty format.
-        :param useheader: if False (default) - headers returned with results.
+        :param useheader: if True (default) - headers returned with results.
         """
         results = []
 
@@ -575,25 +623,33 @@ class PrettyValues(object):
                 if pv.maxwidth > sizes[key]:
                     sizes[key] = pv.maxwidth
 
-        #Build the column headings with the maximum size of the column.
+        #If using headers then build the column size based on:
+        #    a) max size of column heading  -- or --
+        #    b) max size of values in column.
+        #If not using headers then build the column size based on:
+        #    a) max size of values in column.
         headers = []
         for key, cname in self.cols:
             pc = self.cformatters[key, cname]
             newcol = pc.format(cname)
 
             pv = self.vformatters[key, cname]
-            if pv.maxwidth > pc.maxwidth:
-                pc.set_width(pv.maxwidth)
-                pv.set_width(pv.maxwidth)
+            if useheader:
+                if pv.maxwidth > pc.maxwidth:
+                    pc.set_width(pv.maxwidth)
+                    pv.set_width(pv.maxwidth)
 
-                newcol = pc.format(cname)
+                    newcol = pc.format(cname)
+
+                else:
+                    pv.set_width(pc.maxwidth)
 
             else:
-                pv.set_width(pc.maxwidth)
+                pv.set_width(pv.maxwidth)
 
             headers.append(newcol)
 
-        if not noheader:
+        if useheader:
             results.append(headers)
 
         #Format based on the maximum size of the columns.
@@ -615,3 +671,19 @@ def _testit(verbose=None):
 
 if __name__ == "__main__":
     _testit()
+    #pv = PrettyValues()
+    #
+    #pv.newcol(0, 'i')
+    #pv.newcol(1, cname='Column2')
+    #pv.newcol(2, '=+4.1f')
+    #
+    #values = []
+    #values.append([0, 'yhoo', 2])
+    #values.append([1, 'goog', 5])
+    #values.append([2, 'newp', 1])
+    #values.append([3, 'nan', 'nan'])
+    #values.append([4, 'newp', 'inf'])
+    #values.append([5, 'newp', '+inf'])
+    #values.append([6, 'newp', '-inf'])
+
+    #print pv.text(values, "Memory", useheader=False)
