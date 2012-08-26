@@ -487,7 +487,7 @@ class PrettyValues(object):
         :param rowlength: the length of the text table row.
         """
         colcnt = len(self.cols)
-        rowarea = (colcnt * 2) + rowlength
+        rowarea = rowlength + (colcnt * 3 + 1) - 4
 
         _title = title.strip()[:rowarea]
 
@@ -671,6 +671,16 @@ def _testit(verbose=None):
 
 if __name__ == "__main__":
     _testit()
+    #pvcpu = PrettyValues()
+    #pvcpu.newcol(0, cname='Type')
+    #pvcpu.newcol(1, '.2f', cname='CPU Time (ms)')
+    #
+    #lines = []
+    #lines.append(['CPU User', 140.40])
+    #lines.append(['CPU System', 78.0])
+    #lines.append(['CPU Total', 140.40])
+    #print pvcpu.text(lines, title="Max CPU Times")
+    #
     #pv = PrettyValues()
     #
     #pv.newcol(0, 'i')

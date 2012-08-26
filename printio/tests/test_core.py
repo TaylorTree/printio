@@ -989,6 +989,102 @@ class PrettyValues_TestCase(unittest.TestCase):
         self.assertEquals(results[6], '+---+---------+---------+')
         self.assertEquals(len(results), 7)
 
+    def test_text_title1(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, cname='Column2')
+        pv.newcol(2, '+5.2f')
+
+        values = []
+        values.append([0, 'yhoo', 23.45])
+        values.append([1, 'goog', 200.4565])
+        values.append([2, 'newp', 1.00])
+
+        results = pv.text(values, title="Test Title 1").split('\n')
+
+        self.assertEquals(results[0], '+-----------------------+')
+        self.assertEquals(results[1], '|     Test Title 1      |')
+        self.assertEquals(results[2], '+---+---------+---------+')
+        self.assertEquals(results[3], '| 0 | Column2 | 2       |')
+        self.assertEquals(results[4], '+---+---------+---------+')
+        self.assertEquals(results[5], '| 0 | yhoo    | + 23.45 |')
+        self.assertEquals(results[6], '| 1 | goog    | +200.46 |')
+        self.assertEquals(results[7], '| 2 | newp    | +  1.00 |')
+        self.assertEquals(results[8], '+---+---------+---------+')
+        self.assertEquals(len(results), 9)
+
+    def test_text_title_trunc(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, '+5.2f')
+
+        values = []
+        values.append([0, 23.45])
+        values.append([1, 200.4565])
+        values.append([2, 1.00])
+
+        results = pv.text(values, title="Test Title 2").split('\n')
+
+        self.assertEquals(results[0], '+-------------+')
+        self.assertEquals(results[1], '| Test Title  |')
+        self.assertEquals(results[2], '+---+---------+')
+        self.assertEquals(results[3], '| 0 | 1       |')
+        self.assertEquals(results[4], '+---+---------+')
+        self.assertEquals(results[5], '| 0 | + 23.45 |')
+        self.assertEquals(results[6], '| 1 | +200.46 |')
+        self.assertEquals(results[7], '| 2 | +  1.00 |')
+        self.assertEquals(results[8], '+---+---------+')
+        self.assertEquals(len(results), 9)
+
+    def test_text_title_small(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, 'i')
+        pv.newcol(1, '+5.2f')
+
+        values = []
+        values.append([0, 23.45])
+        values.append([1, 200.4565])
+        values.append([2, 1.00])
+
+        results = pv.text(values, title="Title").split('\n')
+
+        self.assertEquals(results[0], '+-------------+')
+        self.assertEquals(results[1], '|    Title    |')
+        self.assertEquals(results[2], '+---+---------+')
+        self.assertEquals(results[3], '| 0 | 1       |')
+        self.assertEquals(results[4], '+---+---------+')
+        self.assertEquals(results[5], '| 0 | + 23.45 |')
+        self.assertEquals(results[6], '| 1 | +200.46 |')
+        self.assertEquals(results[7], '| 2 | +  1.00 |')
+        self.assertEquals(results[8], '+---+---------+')
+        self.assertEquals(len(results), 9)
+
+    def test_text_title_1col(self):
+        pv = PrettyValues()
+
+        pv.newcol(0, '+5.2f')
+
+        values = []
+        values.append([23.45])
+        values.append([200.4565])
+        values.append([1.00])
+
+        results = pv.text(values, title="Title").split('\n')
+
+        self.assertEquals(results[0], '+---------+')
+        self.assertEquals(results[1], '|  Title  |')
+        self.assertEquals(results[2], '+---------+')
+        self.assertEquals(results[3], '| 0       |')
+        self.assertEquals(results[4], '+---------+')
+        self.assertEquals(results[5], '| + 23.45 |')
+        self.assertEquals(results[6], '| +200.46 |')
+        self.assertEquals(results[7], '| +  1.00 |')
+        self.assertEquals(results[8], '+---------+')
+        self.assertEquals(len(results), 9)
+
     def test_format_lod(self):
         pv = PrettyValues()
 
